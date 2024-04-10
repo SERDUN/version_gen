@@ -10,7 +10,7 @@ class VersionGenBuilder extends Builder {
 
   @override
   Map<String, List<String>> get buildExtensions => {
-        r"$lib$": ["version.gen.dart"],
+        r"$lib$": ["**.gen.dart"],
       };
 
   Future<void> generate({
@@ -27,9 +27,10 @@ class VersionGenBuilder extends Builder {
 
     final versionSpec = settings['version_gen']?['version-spec'];
     final specPath = versionSpec ?? pubspecPath;
+    final outputFileName = versionSpec == null ? "version" : basenameWithoutExtension(versionSpec);
 
     final outputPath = settings['version_gen']?['path'] ?? 'lib/gen';
-    final outputFile = File(join(outputPath, 'version.gen.dart'));
+    final outputFile = File(join(outputPath, basenameWithoutExtension(outputFileName) + ".gen.dart"));
 
     if (specPath == pubspecPath) {
       final version = settings['version'] ?? '';
@@ -45,18 +46,30 @@ class VersionGenBuilder extends Builder {
       }
 
       final versionValues = specMap.entries.where((entry) => entry.value is String).map((entry) {
-        String camelCaseKey = entry.key.split('_').map((String e) => e.capitalize()).join();
-        camelCaseKey = camelCaseKey[0].toLowerCase() + camelCaseKey.substring(1);
+        String camelCaseKey = toCamelCase(entry.key);
         return '  static String $camelCaseKey = \'${entry.value}\';';
       }).join('\n');
 
       StringBuffer stringBuffer = StringBuffer();
-      stringBuffer.writeln("class Version {");
+      stringBuffer.writeln("class ${toCamelCase(outputFileName, capitalizeFirstLetter: true)} {");
       stringBuffer.writeln(versionValues);
       stringBuffer.write("}");
 
       await _writeGeneratedFile(outputFile, stringBuffer.toString());
     }
+  }
+
+  String toCamelCase(
+    String key, {
+    bool capitalizeFirstLetter = false,
+  }) {
+    String camelCaseKey = key.split('_').map((String e) => e.capitalize()).join();
+    if (capitalizeFirstLetter) {
+      camelCaseKey = camelCaseKey[0].toUpperCase() + camelCaseKey.substring(1);
+    } else {
+      camelCaseKey = camelCaseKey[0].toLowerCase() + camelCaseKey.substring(1);
+    }
+    return camelCaseKey;
   }
 
   Future<void> _writeGeneratedFile(File file, String content) async {
