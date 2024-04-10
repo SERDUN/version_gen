@@ -13,12 +13,10 @@ void main() {
     const fact = 'test_resources/actual_data/version.gen.dart';
 
     VersionGenBuilder().generate(
-      pubspec: pubspec,
-      genFile: generatedFileName,
+      pubspecPath: pubspec,
+      genFilePath: generatedFileName,
     );
-    final actual = File(join(generatedPath, generatedFileName))
-        .readAsStringSync()
-        .replaceAll('\r\n', '\n');
+    final actual = File(join(generatedPath, generatedFileName)).readAsStringSync().replaceAll('\r\n', '\n');
     final expected = File(fact).readAsStringSync().replaceAll('\r\n', '\n');
     expect(actual, expected);
   });
@@ -30,12 +28,10 @@ void main() {
     const fact = 'test_resources/actual_data/version.gen.dart';
 
     VersionGenBuilder().generate(
-      pubspec: pubspec,
-      genFile: generatedFileName,
+      pubspecPath: pubspec,
+      genFilePath: generatedFileName,
     );
-    final actual = File(join(generatedPath, generatedFileName))
-        .readAsStringSync()
-        .replaceAll('\r\n', '\n');
+    final actual = File(join(generatedPath, generatedFileName)).readAsStringSync().replaceAll('\r\n', '\n');
     final expected = File(fact).readAsStringSync().replaceAll('\r\n', '\n');
     expect(actual, expected);
   });
